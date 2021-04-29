@@ -1,5 +1,4 @@
-from django.db import models
-
+from django.db    import models
 
 # 매물 종류 (원룸, 투룸, 오피스텔, 아파트...)
 class RoomType(models.Model):
@@ -19,6 +18,7 @@ class HouseType(models.Model):
 
 # 집 정보
 class Home(models.Model):
+    name          = models.CharField(max_length=200, null = True)
     road_address  = models.CharField(max_length=500) # 도로명 주소
     dong          = models.CharField(max_length=10) # 동
     ho            = models.CharField(max_length=10) # 호
@@ -27,7 +27,8 @@ class Home(models.Model):
     room_type     = models.ForeignKey("RoomType", on_delete=models.CASCADE)
     house_type    = models.ForeignKey("HouseType", null=True, on_delete=models.SET_NULL)
     user          = models.ForeignKey("users.User", on_delete=models.CASCADE)
-
+    created_at    = models.DateTimeField(auto_now_add = True)
+    
     class Meta:
         db_table = "homes"
 
