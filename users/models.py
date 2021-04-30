@@ -10,7 +10,6 @@ class User(models.Model):
     class Meta:
         db_table = "users"
 
-
 class Like(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE)
     home = models.ForeignKey("homes.Home", on_delete=models.CASCADE)
