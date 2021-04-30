@@ -18,8 +18,8 @@ class HouseType(models.Model):
 class Home(models.Model):
     name          = models.CharField(max_length=200, null = True)
     road_address  = models.CharField(max_length=500) # 도로명 주소
-    dong          = models.CharField(max_length=10) # 동
-    ho            = models.CharField(max_length=10) # 호
+    dong          = models.CharField(max_length=10, null=True) # 동
+    ho            = models.CharField(max_length=10, null=True) # 호
     latitude      = models.DecimalField(max_digits=15, decimal_places=10) # 위도
     longitude     = models.DecimalField(max_digits=15, decimal_places=10) # 경도
     room_type     = models.ForeignKey("RoomType", on_delete=models.CASCADE)
@@ -64,8 +64,8 @@ class RoomInformation(models.Model):
     building_story   = models.IntegerField() # 건물 층수
     floor            = models.IntegerField() # 해당 층수
     heating_type     = models.CharField(max_length=50) # 난방 종류
-    move_in_date     = models.DateField(null=True) # 입주 날짜
     move_in_option   = models.ForeignKey("MoveInOption", on_delete=models.CASCADE)
+    move_in_date     = models.DateField(null=True) # 입주 날짜
     home             = models.ForeignKey("Home", on_delete=models.CASCADE)
     
     class Meta:
@@ -78,7 +78,7 @@ class AdditionalInformation(models.Model):
     parking_fee              = models.DecimalField(max_digits=18, decimal_places=2, default=0) # 주차비
     home                     = models.ForeignKey("Home", on_delete=models.CASCADE)
     maintenance_cost_options = models.ManyToManyField("MaintenanceCostOption", through="InclusionMaintenanceCost")
-    additional_options       = models.ManyToManyField("AdditionalOptions", through="CheckAdditionalOption")
+    additional_options       = models.ManyToManyField("AdditionalOption", through="CheckAdditionalOption")
     room_options             = models.ManyToManyField("RoomOption", through="AdditionalRoomOption")
 
     class Meta:
@@ -100,7 +100,7 @@ class InclusionMaintenanceCost(models.Model):
         db_table = "inclusion_maintenance_cost"
 
 # 추가 정보 옵션 (주차 여부, 엘리베이터, 빌트인...)
-class AdditionalOptions(models.Model):
+class AdditionalOption(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
@@ -110,7 +110,7 @@ class AdditionalOptions(models.Model):
 class CheckAdditionalOption(models.Model):
     is_able                = models.BooleanField(default=False) # 옵션 가능 여부
     additional_information = models.ForeignKey("AdditionalInformation", on_delete=models.CASCADE)
-    additional_option      = models.ForeignKey("AdditionalOptions", on_delete=models.CASCADE)
+    additional_option      = models.ForeignKey("AdditionalOption", on_delete=models.CASCADE)
 
     class Meta:
         db_table = "check_additional_options"
@@ -135,6 +135,7 @@ class DescriptionOption(models.Model):
     title       = models.CharField(max_length=300) # 제목
     description = models.TextField() # 상세 설명
     secret_text = models.TextField() # 비공개 메모
+    home        = models.ForeignKey("Home", on_delete=models.CASCADE)
 
     class Meta:
         db_table = "description_options"
@@ -143,6 +144,7 @@ class DescriptionOption(models.Model):
 class Image(models.Model):
     image_url = models.CharField(max_length=2000)
     sequence  = models.IntegerField()
+    home      = models.ForeignKey("Home", on_delete=models.CASCADE)
 
     class Meta:
         db_table = "images"
