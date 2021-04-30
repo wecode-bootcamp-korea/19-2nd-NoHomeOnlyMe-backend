@@ -7,6 +7,7 @@ class Amenity(models.Model):
     latitude     = models.DecimalField(max_digits = 15, decimal_places = 10) # 위도
     longitude    = models.DecimalField(max_digits = 15, decimal_places = 10) # 경도
     type         = models.ForeignKey("AmenityType", on_delete = models.SET_NULL, null = True)
+
     class Meta:
         db_table = "amenities"
         

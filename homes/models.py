@@ -7,14 +7,12 @@ class RoomType(models.Model):
     class Meta:
         db_table = "room_types"
 
-
 # 건물 유형 (단독 주택, 다가구 주택, 오피스텔...)
 class HouseType(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
         db_table = "house_types"
-
 
 # 집 정보
 class Home(models.Model):
@@ -32,14 +30,12 @@ class Home(models.Model):
     class Meta:
         db_table = "homes"
 
-
 # 거래 종류 (월세, 전세, 매매)
 class SaleType(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
         db_table = "sale_types"
-
 
 # 거래 정보
 class SaleInformation(models.Model):
@@ -52,14 +48,12 @@ class SaleInformation(models.Model):
     class Meta:
         db_table = "sale_informations"
 
-
 # 입주 가능일 옵션 (즉시 입주, 날짜 협의, 날짜 선택)
 class MoveInOption(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
         db_table = "move_in_options"
-
 
 # 방 기본 정보
 class RoomInformation(models.Model):
@@ -77,12 +71,12 @@ class RoomInformation(models.Model):
     class Meta:
         db_table = "room_informatiions"
 
-
 # 방 추가 정보
 class AdditionalInformation(models.Model):
     maintenance_cost         = models.DecimalField(max_digits=18, decimal_places=2, default=0) # 관리비
     is_agreement             = models.BooleanField(default=False) # 관리비 협의 가능 여부
     parking_fee              = models.DecimalField(max_digits=18, decimal_places=2, default=0) # 주차비
+    home                     = models.ForeignKey("Home", on_delete=models.CASCADE)
     maintenance_cost_options = models.ManyToManyField("MaintenanceCostOption", through="InclusionMaintenanceCost")
     additional_options       = models.ManyToManyField("AdditionalOptions", through="CheckAdditionalOption")
     room_options             = models.ManyToManyField("RoomOption", through="AdditionalRoomOption")
@@ -90,14 +84,12 @@ class AdditionalInformation(models.Model):
     class Meta:
         db_table = "additional_informations"
 
-
 # 관리비 옵션 (인터넷, 유선TV, 청소비, 수도세...)
 class MaintenanceCostOption(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
         db_table = "maintenance_cost_options"
-
 
 # 방 추가 정보 + 관리비 옵션 M:N
 class InclusionMaintenanceCost(models.Model):
@@ -107,7 +99,6 @@ class InclusionMaintenanceCost(models.Model):
     class Meta:
         db_table = "inclusion_maintenance_cost"
 
-
 # 추가 정보 옵션 (주차 여부, 엘리베이터, 빌트인...)
 class AdditionalOptions(models.Model):
     name = models.CharField(max_length=50)
@@ -115,7 +106,6 @@ class AdditionalOptions(models.Model):
     class Meta:
         db_table = "additional_options"
     
-
 # 방 추가 정보 + 추가 정보 옵션 M:N
 class CheckAdditionalOption(models.Model):
     is_able                = models.BooleanField(default=False) # 옵션 가능 여부
@@ -125,14 +115,12 @@ class CheckAdditionalOption(models.Model):
     class Meta:
         db_table = "check_additional_options"
 
-
 # 방 옵션 (인덕션, 전자레인지, 에어컨, 세탁기...)
 class RoomOption(models.Model):
     name = models.CharField(max_length=50)
      
     class Meta:
         db_table = "room_options"
-
 
 # 방 추가 정보 + 방 옵션 M:N
 class AdditionalRoomOption(models.Model):
@@ -142,7 +130,6 @@ class AdditionalRoomOption(models.Model):
     class Meta:
         db_table = "additional_room_options"
 
-
 # 상세 설명 옵션
 class DescriptionOption(models.Model):
     title       = models.CharField(max_length=300) # 제목
@@ -151,7 +138,6 @@ class DescriptionOption(models.Model):
 
     class Meta:
         db_table = "description_options"
-
 
 # 사진
 class Image(models.Model):
