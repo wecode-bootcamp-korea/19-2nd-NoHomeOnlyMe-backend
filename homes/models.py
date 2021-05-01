@@ -89,7 +89,7 @@ class RoomInformation(models.Model):
     home             = models.ForeignKey("Home", on_delete=models.CASCADE)
     
     class Meta:
-        db_table = "room_informatiions"
+        db_table = "room_informations"
 
 # 방 추가 정보
 class AdditionalInformation(models.Model):
