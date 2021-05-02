@@ -6,7 +6,8 @@ class User(models.Model):
     password     = models.CharField(max_length=1000)
     phone_number = models.CharField(max_length=20)
     homes        = models.ManyToManyField("homes.Home", through="Like", related_name="user_likes")
-
+    user_code    = models.IntegerField(null = True)
+    
     class Meta:
         db_table = "users"
 
