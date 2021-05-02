@@ -17,7 +17,7 @@ class HouseType(models.Model):
 # 주소지 구
 class GuType(models.Model):
     name      = models.CharField(max_length=10)
-    latitud   = models.DecimalField(max_digits=15, decimal_places=10) # 위도
+    latitude  = models.DecimalField(max_digits=15, decimal_places=10) # 위도
     longitude = models.DecimalField(max_digits=15, decimal_places=10) # 경도
 
     class Meta:
@@ -26,7 +26,7 @@ class GuType(models.Model):
 # 주소지 동
 class DongType(models.Model):
     name      = models.CharField(max_length=10)
-    latitud   = models.DecimalField(max_digits=15, decimal_places=10) # 위도
+    latitude  = models.DecimalField(max_digits=15, decimal_places=10) # 위도
     longitude = models.DecimalField(max_digits=15, decimal_places=10) # 경도
     gu_type   = models.ForeignKey("GuType", null=True, on_delete=models.SET_NULL)
 
@@ -37,14 +37,14 @@ class DongType(models.Model):
 class Home(models.Model):
     name         = models.CharField(max_length=200, null = True)
     road_address = models.CharField(max_length=500) # 도로명 주소
+    legalcode    = models.ForeignKey("DongType", on_delete=models.SET_NULL, null=True) # 주소지 동
     dong         = models.CharField(max_length=10, null=True) # 동
     ho           = models.CharField(max_length=10, null=True) # 호
+    room_type    = models.ForeignKey("RoomType", on_delete=models.CASCADE, null = True)
+    house_type   = models.ForeignKey("HouseType", on_delete=models.SET_NULL, null=True)
     latitud      = models.DecimalField(max_digits=15, decimal_places=10) # 위도
     longitude    = models.DecimalField(max_digits=15, decimal_places=10) # 경도
-    room_type    = models.ForeignKey("RoomType", on_delete=models.CASCADE)
-    house_type   = models.ForeignKey("HouseType", null=True, on_delete=models.SET_NULL)
-    legalcode    = models.ForeignKey("DongType", null=True, on_delete=models.SET_NULL) # 주소지 동
-    user         = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    user         = models.ForeignKey("users.User", on_delete=models.CASCADE, null = True)
     created_at   = models.DateTimeField(auto_now_add = True)
     
     class Meta:
