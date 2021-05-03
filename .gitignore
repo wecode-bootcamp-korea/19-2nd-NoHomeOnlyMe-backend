@@ -358,6 +358,7 @@ zsdoc/data
 
 # Project
 *.csv
+*.sql
 mysettings.py
 db_backups/
 db_backups/.sql
