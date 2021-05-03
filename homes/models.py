@@ -44,6 +44,7 @@ class Home(models.Model):
     house_type   = models.ForeignKey("HouseType", on_delete=models.CASCADE, null=True)
     latitude     = models.DecimalField(max_digits=15, decimal_places=10) # 위도
     longitude    = models.DecimalField(max_digits=15, decimal_places=10) # 경도
+    user         = models.ForeignKey("users.User", on_delete=models.CASCADE, null=True)
     created_at   = models.DateTimeField(auto_now_add = True)
     
     class Meta:
