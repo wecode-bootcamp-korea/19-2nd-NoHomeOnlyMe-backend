@@ -1,7 +1,5 @@
 import re
-import json
 
-from random  import shuffle
 from decimal import Decimal
 
 from django.http.response import JsonResponse
