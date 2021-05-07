@@ -128,9 +128,8 @@ class MapView(View):
         except Amenity.DoesNotExist:
             return JsonResponse({"message" : 'Invalid search word'}, status = 400)
         
-        except Exception as e:
-            print(e)
-            return JsonResponse({"message" : e}, status = 400)
+        except Exception:
+            return JsonResponse({"message" : 'error'}, status = 400)
 
 class RoomListView(View):
     def get(self, request):
@@ -146,5 +145,5 @@ class RoomListView(View):
         except KeyError:
             return JsonResponse({"message" :  "Keyerror"}, status = 400)
         
-        except Exception:
-            return JsonResponse({"message" :  "something error"}, status = 400)
+        except Exception as e:
+            return JsonResponse({"message" :  e}, status = 400)

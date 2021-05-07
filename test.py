@@ -144,3 +144,6 @@ def geocode(address):
 #         home_id = i
 #     )
 #     i += 1
+
+for home in Home.objects.all():
+    pass
