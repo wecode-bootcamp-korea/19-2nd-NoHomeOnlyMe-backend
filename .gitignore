@@ -359,8 +359,10 @@ zsdoc/data
 # Project
 *.csv
 *.sql
+*.txt
+seoul_addresses.txt
+seoul_subway_addresses.csv
 mysettings.py
-db_backups/
-db_backups/.sql
+test.py
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm,vscode,vim,linux,macos,zsh
