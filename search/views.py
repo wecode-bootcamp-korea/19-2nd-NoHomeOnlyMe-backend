@@ -127,14 +127,18 @@ class MapView(View):
     
         except Amenity.DoesNotExist:
             return JsonResponse({"message" : 'Invalid search word'}, status = 400)
+        
+        except Exception as e:
+            print(e)
+            return JsonResponse({"message" : e}, status = 400)
 
 class RoomListView(View):
     def get(self, request):
         try:
             if not request.GET.get('room_id'):
-                room_id = list(range(1, len(Home.objects.all())))
+                room_id = 0
                 
-                return JsonResponse(get_room_list(room_id[:200]), status = 200)
+                return JsonResponse(get_room_list(room_id), status = 200)
             
             room_id = request.GET.get('room_id').split(',')
             return JsonResponse(get_room_list(room_id), status = 200)
