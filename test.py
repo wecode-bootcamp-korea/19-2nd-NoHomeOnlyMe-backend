@@ -145,5 +145,11 @@ def geocode(address):
 #     )
 #     i += 1
 
+i = 1
 for home in Home.objects.all():
-    pass
+       Image.objects.create(
+              image_url = '',
+              sequence = 1,
+              home_id = i
+       )
+       i += 1
