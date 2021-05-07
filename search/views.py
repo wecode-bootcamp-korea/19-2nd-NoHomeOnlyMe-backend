@@ -11,7 +11,7 @@ from django.db.models     import Q
 from .models       import Amenity, AmenityType
 from homes.models  import DongType, GuType, Home
 from .get_response import get_response, get_room_list
-from mysettings    import DEFAULT_MAP_POINT, SEARCH_ZOOM_INIT, ZOOM_DICT
+from mysettings    import DEFAULT_MAP_POINT, SEARCH_ZOOM_INIT
 
 class MapView(View):
     def get(self, request):
@@ -125,9 +125,8 @@ class MapView(View):
                 
             return JsonResponse(get_response(latitude, longitude, zoom, q), status = 200)
     
-        except Exception as e:
-            print(e)
-            return JsonResponse({"message" : e}, status = 400)
+        except Amenity.DoesNotExist:
+            return JsonResponse({"message" : 'Invalid search word'}, status = 400)
 
 class RoomListView(View):
     def get(self, request):
