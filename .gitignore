@@ -364,3 +364,5 @@ db_backups/
 db_backups/.sql
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm,vscode,vim,linux,macos,zsh
+
+test.py

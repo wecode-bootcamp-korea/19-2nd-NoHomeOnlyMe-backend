@@ -2,13 +2,13 @@ import re
 
 from decimal import Decimal
 
+from django.db.models     import Q
 from django.http.response import JsonResponse
 from django.views         import View
-from django.db.models     import Q
 
-from .models       import Amenity, AmenityType
-from homes.models  import DongType, GuType, Home
-from .get_response import get_response, get_room_list
+from rooms.models  import Dong, Gu
+from search.utils  import get_map_data
+from search.models import Amenity, AmenityType
 from mysettings    import DEFAULT_MAP_POINT, SEARCH_ZOOM_INIT
 
 class MapView(View):
@@ -20,7 +20,7 @@ class MapView(View):
                 zoom        = DEFAULT_MAP_POINT["zoom"]
                 q           = Q()
                 
-                return JsonResponse(get_response(latitude, longitude, zoom, q), status = 200)
+                return JsonResponse(get_map_data(latitude, longitude, zoom, q), status = 200)
             
             coords           = request.GET.get('center')
             zoom             = int(request.GET.get('zoom'))
@@ -70,19 +70,19 @@ class MapView(View):
                 q |= Q(roominformation__exclusive_m2__range = (MIN_EXCLUSIVE_M2, MAX_EXCLUSIVE_M2))
             
             search            = request.GET.get('search')
-            compiler_gutype   = re.compile('^[가-힣]+구$')
-            compiler_dongtype = re.compile('^[가-힣]+동$')
+            compiler_Gu   = re.compile('^[가-힣]+구$')
+            compiler_Dong = re.compile('^[가-힣]+동$')
             compiler_subway   = re.compile('^[가-힣]+역$')
             compiler_univ     = re.compile('^[가-힣]+[대학교]$')
             
             if search:
-                if re.match(compiler_dongtype, search):
-                    legalcode = DongType.objects.get(name = search)
+                if re.match(compiler_Dong, search):
+                    legalcode = Dong.objects.get(name = search)
                     latitude  = Decimal(legalcode.latitude)
                     longitude = Decimal(legalcode.longitude)
                     zoom      = SEARCH_ZOOM_INIT['dong_type']
                     
-                    return JsonResponse(get_response(latitude, longitude, zoom, q), status = 200)
+                    return JsonResponse(get_map_data(latitude, longitude, zoom, q), status = 200)
                 
                 elif re.match(compiler_subway, search):
                     amenity   = Amenity.objects.get(name__contains = search, amenity_type = AmenityType.objects.get(name='지하철역'))
@@ -90,7 +90,7 @@ class MapView(View):
                     longitude = Decimal(amenity.longitude)
                     zoom      = SEARCH_ZOOM_INIT["amenity"]
                     
-                    return JsonResponse(get_response(latitude, longitude, zoom, q), status = 200)
+                    return JsonResponse(get_map_data(latitude, longitude, zoom, q), status = 200)
                 
                 elif re.match(compiler_univ, search):
                     words     = list(search)
@@ -100,9 +100,9 @@ class MapView(View):
                     longitude = Decimal(amenity.longitude)
                     zoom      = SEARCH_ZOOM_INIT["amenity"]
                     
-                    return JsonResponse(get_response(latitude, longitude, zoom, q), status = 200)
+                    return JsonResponse(get_map_data(latitude, longitude, zoom, q), status = 200)
                 
-                elif re.match(compiler_gutype, search):
+                elif re.match(compiler_Gu, search):
                     search = search.replace('구', '')
                     if Amenity.objects.filter(name__contains = search).exists:
                         search    = search.replace('구', '')
@@ -111,37 +111,20 @@ class MapView(View):
                         longitude = Decimal(amenity.longitude)
                         zoom      = SEARCH_ZOOM_INIT["amenity"]
                     else:
-                        legalcode = GuType.objects.get(name = search).dong_type_set.select_related().first()
+                        legalcode = Gu.objects.get(name = search).dong_type_set.select_related().first()
                         latitude  = Decimal(legalcode.latitude)
                         longitude = Decimal(legalcode.longitude)
                         zoom      = SEARCH_ZOOM_INIT["dong_type"]
                     
-                    return JsonResponse(get_response(latitude, longitude, zoom, q), status = 200)
+                    return JsonResponse(get_map_data(latitude, longitude, zoom, q), status = 200)
                 
                 else:
                     return JsonResponse({"message" : "Invalid search word"}, status = 400)
                 
-            return JsonResponse(get_response(latitude, longitude, zoom, q), status = 200)
+            return JsonResponse(get_map_data(latitude, longitude, zoom, q), status = 200)
     
         except Amenity.DoesNotExist:
             return JsonResponse({"message" : 'Invalid search word'}, status = 400)
         
         except Exception:
             return JsonResponse({"message" : 'error'}, status = 400)
-
-class RoomListView(View):
-    def get(self, request):
-        try:
-            if not request.GET.get('room_id'):
-                room_id = 0
-                
-                return JsonResponse(get_room_list(room_id), status = 200)
-            
-            room_id = request.GET.get('room_id').split(',')
-            return JsonResponse(get_room_list(room_id), status = 200)
-        
-        except KeyError:
-            return JsonResponse({"message" :  "Keyerror"}, status = 400)
-        
-        except Exception as e:
-            return JsonResponse({"message" :  e}, status = 400)
