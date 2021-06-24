@@ -1,7 +1,9 @@
 from decimal import Decimal
 from math    import pi
 
-from search.models import Amenity
+from django.http.response import JsonResponse
+
+from search.models import Amenity, AmenityType
 from homes.models  import GuType, DongType, Home
 from mysettings    import MEAN_EARTH_RADIUS, ZOOM_DICT
 
@@ -15,7 +17,7 @@ def get_response(latitude, longitude, zoom, q):
     
     if ZOOM_DICT[zoom]['boxsize'] == '구':
         gu_list   = GuType.objects.filter(latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG))
-        home_list = Home.objects.filter(q, latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG)).distinct()
+        home_list = Home.objects.filter(q, latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG), id__lte = 600).distinct()
         room_list = [{
                 "name"      : gu.name,
                 "latitude"  : float(gu.latitude),
@@ -25,7 +27,7 @@ def get_response(latitude, longitude, zoom, q):
     
     if ZOOM_DICT[zoom]['boxsize'] == '동' or type(ZOOM_DICT[zoom]['boxsize']) == int:
         dong_list = DongType.objects.filter(latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG))
-        home_list = Home.objects.filter(q, latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG)).distinct()
+        home_list = Home.objects.filter(q, latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG), id__lte = 600).distinct()
         room_list = [{
                 "name"      : dong.name,
                 "latitude"  : float(dong.latitude),
@@ -33,7 +35,12 @@ def get_response(latitude, longitude, zoom, q):
                 "room_id"   : [home.id for home in home_list if home.legalcode.id == dong.id]
                 } for dong in dong_list]
     
-    amenity_list = Amenity.objects.filter(latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG))
+    subway_list = Amenity.objects.filter(latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG), type_id = 1)
+    univ_list = Amenity.objects.filter(latitude__range = (MIN_LAT, MAX_LAT), longitude__range = (MIN_LNG, MAX_LNG), type_id = 2)
+    
+    SLICING = 10
+    subway_list = [subway for subway in subway_list if subway.id % SLICING == 0]
+    univ_list = [univ for univ in univ_list if univ.id % SLICING == 0]
     
     results = {
         "center" : {
@@ -45,17 +52,19 @@ def get_response(latitude, longitude, zoom, q):
             "name"      : subway.name,
             "latitude"  : float(subway.latitude),
             "longitude" : float(subway.longitude)
-            } for subway in amenity_list if subway.type.name == '지하철역'],
+            } for subway in subway_list],
         "univ_list" : [{
             "name"      : univ.name,
             "latitude"  : float(univ.latitude),
             "longitude" : float(univ.longitude)
-            } for univ in amenity_list if univ.type.name == '대학교']
+            } for univ in univ_list]
         }
-    
     return results
 
 def get_room_list(room_id):
+    
+    if room_id == 0:
+        return {"results" : []}
     
     home_list = [Home.objects.get(id = id) for id in room_id]
     

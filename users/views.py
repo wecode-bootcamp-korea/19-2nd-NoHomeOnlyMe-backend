@@ -7,7 +7,7 @@ from django.http  import JsonResponse
 
 from mysettings import SECRET_KEY, ALGORITHM
 from .models    import User
-from homes.models import Home
+
 class KakaoSignInView(View):
     def post(self, request):
         try:  
