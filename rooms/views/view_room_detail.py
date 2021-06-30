@@ -1,23 +1,19 @@
-import json
-
 from haversine import haversine
 
 from django.views     import View
 from django.http      import JsonResponse
 from django.db.models import Q
 
-from homes.models  import Home
+from rooms.models  import Room
 from search.models import Amenity
 
-from homes.utils import add_hundred_million, check_monthly_pay
-
 class RoomDetailView(View):
-    def get(self, request, home_id):
+    def get(self, request, room_id):
         try:
-            if not Home.objects.filter(id=home_id).exists():
+            if not Room.objects.filter(id=room_id).exists():
                 return JsonResponse({"MESSAGE": "NOT_FOUND"}, status=404)
 
-            room = Home.objects.get(id=home_id)
+            room = Room.objects.get(id=room_id)
 
             # move_in_date가 "날짜 선택"일 경우, 날짜로 표기
             move_in_date = room.roominformation_set.first().move_in_option.name
@@ -44,13 +40,13 @@ class RoomDetailView(View):
             )
 
             result = {
-                "home_id"       : room.id,
+                "room_id"       : room.id,
                 "detail_header" : {
                     "room_type"        : room.room_type.name,
                     "name"             : room.name,
                     "sale_type"        : room.saleinformation_set.first().sale_type.name,
-                    "deposit"          : add_hundred_million(room.saleinformation_set.first().deposit),
-                    "monthly_pay"      : check_monthly_pay(room.saleinformation_set.first().monthly_pay),
+                    "deposit"          : room.saleinformation_set.first().deposit,
+                    "monthly_pay"      : room.saleinformation_set.first().monthly_pay,
                     "exclusive_m2"     : float(room.roominformation_set.first().exclusive_m2),
                     "exclusive_pyeong" : room.roominformation_set.first().exclusive_pyeong,
                     "month_total_cost" : (int(room.saleinformation_set.first().monthly_pay) \
@@ -102,18 +98,18 @@ class RoomDetailView(View):
             }
 
             # 동일한 유저가 올린 다른 매물
-            if Home.objects.filter(user_id = room.user_id).count() > 1:
+            if Room.objects.filter(user_id = room.user_id).count() > 1:
                 result["other_rooms"] = [{
-                    "home_id"          : other_room.id,
+                    "room_id"          : other_room.id,
                     "image"            : other_room.image_set.first().image_url,
                     "room_type"        : other_room.room_type.name,
                     "sale_type"        : other_room.saleinformation_set.first().sale_type.name,
-                    # "deposit"          : add_hundred_million(other_room.saleinformation_set.first().deposit),
-                    # "monthly_pay"      : check_monthly_pay(other_room.saleinformation_set.first().monthly_pay),
+                    "deposit"          : other_room.saleinformation_set.first().deposit,
+                    "monthly_pay"      : other_room.saleinformation_set.first().monthly_pay,
                     "floor"            : other_room.roominformation_set.first().floor,
                     "exclusive_m2"     : float(room.roominformation_set.first().exclusive_m2),
                     "maintenance_cost" : int(room.additionalinformation_set.first().maintenance_cost),  
-                } for other_room in Home.objects.filter(id__gte = 6500, user_id = room.user_id) if other_room.id != home_id][:4]
+                } for other_room in Room.objects.filter(id__gte = 6500, user_id = room.user_id) if other_room.id != room_id][:4]
 
             return JsonResponse({"RESULT": result}, status=200)
         except Exception as e:
