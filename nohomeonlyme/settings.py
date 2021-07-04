@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "django_extensions",
     "rooms",
     "users",
     "search",
@@ -62,8 +63,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "nohomeonlyme.wsgi.application"
 
-AUTH_USER_MODEL = "users.User"
-
 LOGGING = {
     'disable_existing_loggers': False,
     'version': 1,
@@ -87,9 +86,9 @@ LOGGING = {
 
 DATABASES = mysettings.DATABASES
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+AUTH_USER_MODEL = "users.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
