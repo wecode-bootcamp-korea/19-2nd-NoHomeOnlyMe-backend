@@ -10,9 +10,8 @@ def search_keyword(keyword : str) -> dict:
     COMPILE_GU     = re.compile("^[가-힣]+구$")
     COMPILE_DONG   = re.compile("^[가-힣]+동$")
     COMPILE_SUBWAY = re.compile("^[가-힣]+역$")
-    COMPILE_UNIV1  = re.compile("^[가-힣]+[대학교]$")
-    COMPILE_UNIV2  = re.compile("^[가-힣]+[대학]$")
-    COMPILE_UNIV3  = re.compile("^[가-힣]+[대]$")
+    COMPILE_UNIV1  = re.compile("^[가-힣]+대학교$")
+    COMPILE_UNIV2  = re.compile("^[가-힣]+대학$")
     
     if re.match(COMPILE_GU, keyword):
         try:
@@ -73,10 +72,10 @@ def search_keyword(keyword : str) -> dict:
                 "code" : CODES["INVALID KEYWORD"],
             }
     
-    if re.match(COMPILE_UNIV1, keyword) or re.match(COMPILE_UNIV2, keyword) or re.match(COMPILE_UNIV3, keyword) :
+    if re.match(COMPILE_UNIV1, keyword) or re.match(COMPILE_UNIV2, keyword):
         keyword = keyword.rsplit("대")[0]
         
-        amenity = Amenity.objects.filter(name__contains = keyword, amenity_type__name = '대학교')
+        amenity = Amenity.objects.filter(name__contains = keyword, amenity_type__name = '대학교').first()
         
         if not amenity:
             return {

@@ -1,33 +1,40 @@
-from rooms.models import Room
+from django.db.models import Q
 
-def get_room_list(room_id):
+from .            import CODES, ZOOM_DICT
+from rooms.models import *
+
+def get_room_list(circle_id : int, zoom : int) -> dict:
     
-    if not room_id:
-        return {"results" : []}
+    box_size = ZOOM_DICT[zoom]["box_size"]
+    if box_size == "구":
+        q = Q(gu_id = circle_id) # 추가 구현 필요 -> 실제 서비스에서는 "구" 단위의 매물 리스트 정보 제공을 하지 않음
+    if box_size == "동":
+        q = Q(dong_id = circle_id)
+    if type(box_size) == int: # 추가 구현 필요 -> zoom 단계가 16이상일 때 rectangle section modeling 변경 및 결과 로직 추가 
+        q = Q(dong_id = circle_id)
     
-    room_list = [Room.objects.get(id = id) for id in room_id]
+    room_list = Room.objects.filter(q)
     
-    result = [{
-        "id"               : room.id,
-        "image_url"        : [image.image_url for image in room.image_set.select_related().all()],
-        "sale_type"        : room.saleinformation_set.select_related().first().sale_type.name,
-        "deposit"          : int(room.saleinformation_set.select_related().first().deposit),
-        "monthly_pay"      : int(room.saleinformation_set.select_related().first().monthly_pay),
-        "room_type"        : room.room_type.name,
-        "exclusive_m2"     : float(room.roominformation_set.select_related().first().exclusive_m2),
-        "maintenance_cost" : int(room.additionalinformation_set.select_related().first().maintenance_cost)
+    try:
+        room_contants = [{
+            "deposit"          : float((sale_info := room.sale_info.first()).deposit),
+            "title"            : room.description.title,
+            "exclusive_m2"     : float(room.room_info.exclusive_m2),
+            "id"               : room.id,
+            "image"            : room.images.order_by("sequence").first().image_url,
+            "maintenance_cost" : int(room.additional_info.maintenance_cost),
+            "monthly_pay"      : float(sale_info.monthly_pay),
+            "room_type"        : room.room_type.name,
+            "sale_type"        : sale_info.sale_type.name,
+            } for room in room_list]
+        
+        return {
+            "CODE"      : CODES["OK"],
+            "room_list" : room_contants,
+            }
+    
+    except Exception:
+        return {
+            "CODE"      : CODES["INVALID KEYWORD"],
+            "room_lost" : []
         }
-        if room.saleinformation_set.select_related().first().sale_type.name == '월세'
-        else
-        {
-        "id"               : room.id,
-        "image_url"        : [image.image_url for image in room.image_set.select_related().all()],
-        "sale_type"        : room.saleinformation_set.select_related().first().sale_type.name,
-        "deposit"          : int(room.saleinformation_set.select_related().first().deposit),
-        "monthly_pay"      : None,
-        "room_type"        : room.room_type.name,
-        "exclusive_m2"     : float(room.roominformation_set.select_related().first().exclusive_m2),
-        "maintenance_cost" : int(room.additionalinformation_set.select_related().first().maintenance_cost)
-        } for room in room_list]
-    
-    return {"results" : result}
