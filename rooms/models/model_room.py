@@ -10,8 +10,8 @@ class Room(models.Model):
     longitude     = models.DecimalField(max_digits=15, decimal_places=10)
     building_type = models.ForeignKey("BuildingType", on_delete=models.CASCADE, null = True, related_name = "rooms")
     dong          = models.ForeignKey("Dong", on_delete = models.SET_NULL, null = True, related_name = "rooms")
-    gu            = models.ForeignKey("Gu",   on_delete = models.SET_NULL, null = True, related_name = "rooms")
-    room_type     = models.ForeignKey("RoomType",     on_delete=models.CASCADE, null = True, related_name = "rooms")
+    gu            = models.ForeignKey("Gu", on_delete = models.SET_NULL, null = True, related_name = "rooms")
+    room_type     = models.ForeignKey("RoomType", on_delete=models.CASCADE, null = True, related_name = "rooms")
     created_at    = models.DateTimeField(auto_now_add = True)
     updated_at    = models.DateTimeField(auto_now = True)
     

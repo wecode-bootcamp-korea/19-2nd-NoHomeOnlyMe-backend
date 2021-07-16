@@ -244,3 +244,36 @@
 #                 'longitude': 127.0534443,
 #                 }]
 #         })
+
+def hello(self, student):
+    blog_tally = ""
+    session_tally = ""
+    assignment_tally = ""
+    
+    # student에서 blog_tally, session_tally, assignment_tally를 뽑아올 수 있나요~?
+    a = {}
+    
+    # 각 tally들의 data type은~?
+    for tally in blog_tally:
+        key = tally[0].strftime("%Y-%m-%d")
+        if key not in a:
+            a[key] = tally[1]
+        else:
+            a[key] += tally[1]
+    
+    for tally in session_tally:
+        key = tally[0].strftime("%Y-%m-%d")
+        if key not in a:
+            a[key] = tally[1]
+        else:
+            a[key] += tally[1]
+    
+    for tally in assignment_tally:
+        key = tally[0].strftime("%Y-%m-%d")
+        if key not in a:
+            a[key] = tally[1]
+        else:
+            a[key] += tally[1]
+    
+    return [(), (), ()]
+    # 각 튜플 안에 들어갈 값은 뭐에요~?

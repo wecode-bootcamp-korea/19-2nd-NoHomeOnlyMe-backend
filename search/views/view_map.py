@@ -1,10 +1,10 @@
 from decimal import Decimal
 
 from django.db.models     import Q
-from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
+from django.http.response import (HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse)
 from django.views         import View
 
-from search.utils  import (CODES, get_mapview_results, filter_keyword, DEFAULT_MAP_POINT, search_keyword)
+from search.utils  import (CODES, DEFAULT_MAP_POINT, filter_keyword, get_mapview_results, search_keyword, ZOOM_DICT)
 
 class MapView(View):
     def get(self, request):
@@ -15,6 +15,9 @@ class MapView(View):
             q      = Q()
             
             if center and zoom:
+                if int(zoom) not in list(ZOOM_DICT.keys()):
+                    zoom = DEFAULT_MAP_POINT["zoom"]
+                
                 if center.find(",") == -1:
                     return HttpResponseBadRequest("Worng center form")
                 

@@ -33,4 +33,7 @@ CODES = {
         "OK"                 : 200,
         "INVALID KEYWORD"    : 400,
         "RESOURCE NOT FOUND" : 404,
+        200 : "OK",
+        400 : "INVALID KEYWORD",
+        404 : "RESOURCE NOT FOUND",
     }
