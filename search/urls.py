@@ -4,5 +4,5 @@ from .views import MapView, RoomListView
 
 urlpatterns = [
     path('/map', MapView.as_view()),
-    path('/room', RoomListView.as_view()),
+    path('/list', RoomListView.as_view()),
 ]
