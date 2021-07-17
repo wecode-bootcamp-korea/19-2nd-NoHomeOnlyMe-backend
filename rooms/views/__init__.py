@@ -1,1 +1,0 @@
-from .view_room_detail import RoomDetailView
